@@ -3,7 +3,7 @@ from PIL import Image
 import io
 import tensorflow as tf
 
-MODEL_DIR = "flaskr\model"
+MODEL_DIR = "flaskr/model"
 model = tf.saved_model.load(MODEL_DIR)
 
 def image_np(data):
@@ -14,18 +14,26 @@ def process_image(path):
         with open(path, 'rb') as f:
             data = f.read()
             image = image_np(data)
-        input_tensor = tf.convert_to_tensor(image)
-        input_tensor = input_tensor[tf.newaxis,...]
+        
+        if len(image.shape) == 2:  
+            image = np.stack([image] * 3, axis=-1)
+        elif image.shape[2] == 1:  
+            image = np.concatenate([image] * 3, axis=-1)
+        elif image.shape[2] == 4: 
+            image = image[..., :3]
 
-        detections = model(input_tensor)    
-        print(detections)
+        input_tensor = tf.convert_to_tensor(image, dtype=tf.uint8)
+        input_tensor = tf.expand_dims(input_tensor, axis=0)
+
+        detections = model(input_tensor)
+        
         detection_scores = detections['detection_scores'][0].numpy()
         detection_classes = detections['detection_classes'][0].numpy().astype(np.int64)
         detection_boxes = detections['detection_boxes'][0].numpy()
 
         results = []
         for i in range(len(detection_scores)):
-            if(detection_scores[i] > 0.5):
+            if detection_scores[i] > 0.3:
                 result = {
                     'score': float(detection_scores[i]),
                     'class': int(detection_classes[i]),
@@ -36,5 +44,4 @@ def process_image(path):
         return results
     
     except Exception as e:
-        return {'error' : str(e)}
-
+        return {'error': str(e)}
