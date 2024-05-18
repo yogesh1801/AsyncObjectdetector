@@ -5,7 +5,6 @@ import tensorflow as tf
 import os
 from flaskr.utils.classnames import getClassName
 from flaskr.celery_config import celery_app
-import time
 
 MODEL_DIR = "flaskr/model"
 model = tf.saved_model.load(MODEL_DIR)
@@ -15,7 +14,6 @@ def image_np(data):
 
 @celery_app.task
 def process_image(path):
-    time.sleep(10)
     try:
         with open(path, 'rb') as f:
             data = f.read()

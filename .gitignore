@@ -1,6 +1,6 @@
 *tmp
 config.env
-.venv
+venv
 flaskr/model/
 *.pyc
 *.pyo
