@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 import tensorflow as tf
 from ..utils.process_image import process_image
-import os 
+import os
 
 dt = Blueprint('detect', __name__, url_prefix='/api')
 
@@ -17,7 +17,7 @@ def detect():
     file_path = os.path.join("tmp", file.filename)
     file.save(file_path)
 
-    task = process_image(file_path)
+    task = process_image.delay(file_path)
 
-    return jsonify({'predictions': task}), 202
+    return jsonify({'task_id': task.id}), 202
     

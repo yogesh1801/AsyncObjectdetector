@@ -1,4 +1,7 @@
 *tmp
 config.env
 .venv
-flaskr/model
+flaskr/model/
+*.pyc
+*.pyo
+*.pyd
