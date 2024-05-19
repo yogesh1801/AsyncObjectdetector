@@ -1,8 +1,10 @@
 from celery import Celery
-from dotenv import load_dotenv
-load_dotenv()
+import os 
 
-celery_app = Celery('main', broker='redis://127.0.0.1:6379/0', backend='redis://127.0.0.1:6379/0')
+broker_url = os.getenv('CELERY_BROKER_URL', 'redis://127.0.0.1:6379/0')
+backend_url = os.getenv('CELERY_RESULT_BACKEND', 'redis://127.0.0.1:6379/0')
+
+celery_app = Celery('main', broker=broker_url, backend=backend_url)
 celery_app.autodiscover_tasks(['flaskr.utils.process_image'])
 
 celery_app.conf.task_routes = {
